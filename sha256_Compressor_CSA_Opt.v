@@ -7,15 +7,13 @@ module fulladder(a, b, c, sum, carry);
 
 endmodule
 
-module CSA(xin, yin, zin, s, c, sum_out);
-	input reg [31:0] xin,yin,zin;
-	output reg [31:0] s,c,sum_out;
+module CSA(x_in, y_in, z_in, s, c);
+	input reg [31:0] x_in,y_in,z_in;
+	output reg [31:0] s,c;
             
 	for (i=0; i < 32; i=i +1) begin
-		fulladder inst(xin[i], yin[i], zin[i], s[i], c[i]);
+		fulladder inst (x_in[i], y_in[i], z_in[i], s[i], c[i]);
 	end	
-
-	sum_out = s + c;
 	
 endmodule
 
@@ -86,8 +84,16 @@ reg [31 : 0] sum_E;
 reg [31 : 0] CH_EFG;
 reg [31 : 0] sum_A;
 reg [31 : 0] MAJ_ABC;
-reg [31 : 0] T1;
-reg [31 : 0] T2;
+	
+reg [31 : 0] M1;
+reg [31 : 0] M2;	
+	
+reg [31 : 0] Epsilon;
+reg [31 : 0] L;
+reg [31 : 0] Alpha;
+
+//reg [31 : 0] T1;
+//reg [31 : 0] T2;
 
 /*****************************************/
 
@@ -162,17 +168,41 @@ begin
       endcase 
 end 
 
-
-
-
+inout wire [31:0] sum_out;
+inout wire [31:0] carry_out;
+inout wire [31:0] sum_temp;
+inout wire [31:0] carry_temp;
+	
 /*******************************************************************
   
-  // T1_logic
+  // M1_logic and M2_logic
   
   *******************************************************************/
   
   always @*     
-    begin : t1_logic
+    begin : m1_logic
+	    
+	    CSA inst_m2(w_data, k_out, h_reg, sum_out, carry_out);
+	    
+	    M2 = sum_out + carry_out;
+	    sum_temp = sum_out;
+	    carry_temp = carry_out;
+	    
+	    
+	    CSA inst_m1(d_reg, sum_temp, carry_temp, sum_out, Carry_out);
+	    
+	    M1 = sum_out + carry_out;
+	    
+    end // m_logic
+
+/*******************************************************************
+  
+  // Epsilon_logic and L_logic
+  
+  *******************************************************************/
+  
+  always @*     
+    begin : Epsilon_logic
       
 
       sum_E = {e_reg[5  : 0], e_reg[31 :  6]} ^
@@ -181,18 +211,24 @@ end
 
       CH_EFG = (e_reg & f_reg) ^ ((~e_reg) & g_reg);
 
-      T1 = h_reg + sum_E + CH_EFG + w_data + k_out;
-    end // t1_logic
+	    CSA inst_epsilon(sum_E, CH_EFG, M1, sum_out, carry_out);
+	    
+	    Epsilon = sum_out + carry_out
+	    
+	    CSA inst_L(sum_E, CH_EFG, M2, sum_out, carry_out);
+	    
+	    L = sum_out + carry_out
+	    
+    end // l_logic
 
+/*******************************************************************
   
-  /*******************************************************************
-  
-  // T2_logic
+  // Alpha_logic
   
   *******************************************************************/
   
   always @*     
-    begin : t2_logic
+    begin : Alpha_logic
       
 
       sum_A = {a_reg[1  : 0], a_reg[31 :  2]} ^
@@ -201,12 +237,13 @@ end
 
       MAJ_ABC = (a_reg & b_reg) ^ (a_reg & c_reg) ^ (b_reg & c_reg);
 
-      T2 = sum_A + MAJ_ABC;
-    end // t2_logic
+	    CSA inst_alpha(sum_A, MAJ_ABC, L, sum_out, carry_out);
+	    
+	    Alpha = sum_out + carry_out
+	    
+    end // l_logic
 
 /******************************************************************************/
-
-
 
 // A-H update logic
 
@@ -255,11 +292,11 @@ begin
 
      2'b01:                                     // When the 1 < round < 63 , initial_round =  0, partial rounds = 1                 
         begin
-          a_new  = T1 + T2;
+          a_new  = Alpha;
           b_new  = a_reg;
           c_new  = b_reg;
           d_new  = c_reg;
-          e_new  = d_reg + T1;
+          e_new  = Epsilon;
           f_new  = e_reg;
           g_new  = f_reg;
           h_new  = g_reg;
