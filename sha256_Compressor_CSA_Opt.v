@@ -1,3 +1,24 @@
+module fulladder(a, b, c, sum, carry);
+	input a,b,c;
+	output sum,carry;
+
+	assign sum = a ^ b ^ cin;
+	assign carry = (a & b) | (cin & b) | (a & cin);
+
+endmodule
+
+module CSA(x, y, z, s, c, sum_out);
+	input reg [31:0] x,y,z;
+	output reg [31:0] s,c,sum_out;
+            
+	for (i=0; i < 32; i=i +1) begin
+		fulladder inst(x[i], y[i], z[i], s[i], c[i])
+	end	
+
+	sum_out = s + c;
+	
+endmodule
+
 module sha256_update_variables (
 		
 			           input  wire init_round, 
