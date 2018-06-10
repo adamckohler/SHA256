@@ -7,12 +7,12 @@ module fulladder(a, b, c, sum, carry);
 
 endmodule
 
-module CSA(x, y, z, s, c, sum_out);
-	input reg [31:0] x,y,z;
+module CSA(X, Y, Z, s, c, sum_out);
+	input reg [31:0] X,Y,Z;
 	output reg [31:0] s,c,sum_out;
             
 	for (i=0; i < 32; i=i +1) begin
-		fulladder inst(x[i], y[i], z[i], s[i], c[i]);
+		fulladder inst(X[i], Y[i], Z[i], s[i], c[i]);
 	end	
 
 	sum_out = s + c;
