@@ -1,11 +1,3 @@
-module fulladder(a, b, c, sum, carry);
-	input a,b,c;
-	output sum,carry;
-
-	assign sum = a ^ b ^ cin;
-	assign carry = (a & b) | (cin & b) | (a & cin);
-
-endmodule
 
 module CSA(x_in, y_in, z_in, s, c);
 	input reg [31:0] x_in,y_in,z_in;
