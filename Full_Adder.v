@@ -1,8 +1,13 @@
-module fulladder(a, b, c, sum, carry);
-	input a,b,c;
-	output sum,carry;
+module fulladder(
+		input wire a,
+		input wire b,
+		input wire c,
+	
+		output wire sum,
+		output wire carry
+		);
 
-	assign sum = a ^ b ^ cin;
-	assign carry = (a & b) | (cin & b) | (a & cin);
+	assign sum = a ^ b ^ c;
+	assign carry = (a & b) | (c & b) | (a & c);
 
 endmodule
