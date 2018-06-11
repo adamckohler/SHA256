@@ -65,8 +65,13 @@ reg [31 : 0] sum_E;
 reg [31 : 0] CH_EFG;
 reg [31 : 0] sum_A;
 reg [31 : 0] MAJ_ABC;
-reg [31 : 0] T1;
-reg [31 : 0] T2;
+	
+	
+reg [31 : 0] T1_s;
+reg [31 : 0] T1_c;
+	
+reg [31 : 0] T2_s;
+reg [31 : 0] T2_c;
 
 /*****************************************/
 
@@ -142,7 +147,8 @@ begin
 end 
 
 
-
+wire [31:0] temp_sum;
+wire [31:0] temp_carry;
 
 /*******************************************************************
   
@@ -159,11 +165,49 @@ end
              {e_reg[24 : 0], e_reg[31 : 25]};
 
       CH_EFG = (e_reg & f_reg) ^ ((~e_reg) & g_reg);
+	    
+	    
+	    CSA H_K_W_inst (
+		    .x_in(h_reg),
+		    .y_in(w_data),
+		    .z_in(k_out),
+		    
+		    .s_out(temp_sum),
+		    .c_out(temp_carry)
+	    	);
+	    
+	    CSA CH_inst (
+		    .x_in(temp_sum),
+		    .y_in(temp_carry),
+		    .z_in(CH_EFG),
+		    
+		    .s_out(temp_sum),
+		    .c_out(temp_carry)
+	    	);
+	    
+	    CSA SUM_E_inst (
+		    .x_in(temp_sum),
+		    .y_in(temp_carry),
+		    .z_in(sum_E),
+		    
+		    .s_out(temp_sum),
+		    .c_out(temp_carry)
+	    	);
+	    
+	    T2_s = temp_sum;
+	    T2_c = temp_carry;
+	    
+	    CSA D_inst (
+		    .x_in(temp_sum),
+		    .y_in(temp_carry),
+		    .z_in(d_reg),
+		    
+		    .s_out(T1_s),
+		    .c_out(T1_c)
+	    	);
 
-      T1 = h_reg + sum_E + CH_EFG + w_data + k_out;
     end // t1_logic
 
-  
   /*******************************************************************
   
   // T2_logic
@@ -180,7 +224,24 @@ end
 
       MAJ_ABC = (a_reg & b_reg) ^ (a_reg & c_reg) ^ (b_reg & c_reg);
 
-      T2 = sum_A + MAJ_ABC;
+	    CSA MAJ_inst (
+		    .x_in(T2_s),
+		    .y_in(T2_c),
+		    .z_in(MAJ_ABC),
+		    
+		    .s_out(T2_s),
+		    .c_out(T2_c)
+	    	);
+	    
+	    CSA SUM_A_inst (
+		    .x_in(T2_s),
+		    .y_in(T2_c),
+		    .z_in(sum_A),
+		    
+		    .s_out(T2_s),
+		    .c_out(T2_c)
+	    	);
+	    
     end // t2_logic
 
 /******************************************************************************/
@@ -234,11 +295,11 @@ begin
 
      2'b01:                                     // When the 1 < round < 63 , initial_round =  0, partial rounds = 1                 
         begin
-          a_new  = T1 + T2;
+          a_new  = T2_s + T2_c;
           b_new  = a_reg;
           c_new  = b_reg;
           d_new  = c_reg;
-          e_new  = d_reg + T1;
+          e_new  = T1_s + T1_c;
           f_new  = e_reg;
           g_new  = f_reg;
           h_new  = g_reg;
