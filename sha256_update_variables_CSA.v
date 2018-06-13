@@ -156,7 +156,6 @@ end
   
   always @*     
     begin : t1_logic
-      
 
       sum_E = {e_reg[5  : 0], e_reg[31 :  6]} ^
              {e_reg[10 : 0], e_reg[31 : 11]} ^
@@ -164,46 +163,36 @@ end
 
       CH_EFG = (e_reg & f_reg) ^ ((~e_reg) & g_reg);
 	    
-	    
 	    CSA H_K_W_inst (
 		    .x_in(h_reg),
 		    .y_in(w_data),
 		    .z_in(k_out),
-		    
 		    .s_out(T1_s),
 		    .c_out(T1_c)
 	    	);
-	    
 	    CSA CH_inst (
 		    .x_in(T1_s),
 		    .y_in(T1_c),
 		    .z_in(CH_EFG),
-		    
 		    .s_out(T1_s),
 		    .c_out(T1_c)
 	    	);
-	    
 	    CSA SUM_E_inst (
 		    .x_in(T1_s),
 		    .y_in(T1_c),
 		    .z_in(sum_E),
-		    
 		    .s_out(T1_s),
 		    .c_out(T1_c)
 	    	);
-	    
 	    T2_s = T1_s;
 	    T2_c = T1_c;
-	    
 	    CSA D_inst (
 		    .x_in(T1_s),
 		    .y_in(T1_c),
 		    .z_in(d_reg),
-		    
 		    .s_out(T1_s),
 		    .c_out(T1_c)
 	    	);
-
     end // t1_logic
 
   /*******************************************************************
@@ -214,7 +203,6 @@ end
   
   always @*     
     begin : t2_logic
-      
 
       sum_A = {a_reg[1  : 0], a_reg[31 :  2]} ^
              {a_reg[12 : 0], a_reg[31 : 13]} ^
@@ -226,20 +214,16 @@ end
 		    .x_in(T2_s),
 		    .y_in(T2_c),
 		    .z_in(MAJ_ABC),
-		    
 		    .s_out(T2_s),
 		    .c_out(T2_c)
 	    	);
-	    
 	    CSA SUM_A_inst (
 		    .x_in(T2_s),
 		    .y_in(T2_c),
 		    .z_in(sum_A),
-		    
 		    .s_out(T2_s),
 		    .c_out(T2_c)
-	    	);
-	    
+	    	);    
     end // t2_logic
 
 /******************************************************************************/
