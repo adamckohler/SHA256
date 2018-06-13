@@ -147,8 +147,6 @@ begin
 end 
 
 
-wire [31:0] temp_sum;
-wire [31:0] temp_carry;
 
 /*******************************************************************
   
@@ -172,34 +170,34 @@ wire [31:0] temp_carry;
 		    .y_in(w_data),
 		    .z_in(k_out),
 		    
-		    .s_out(temp_sum),
-		    .c_out(temp_carry)
+		    .s_out(T1_s),
+		    .c_out(T1_c)
 	    	);
 	    
 	    CSA CH_inst (
-		    .x_in(temp_sum),
-		    .y_in(temp_carry),
+		    .x_in(T1_s),
+		    .y_in(T1_c),
 		    .z_in(CH_EFG),
 		    
-		    .s_out(temp_sum),
-		    .c_out(temp_carry)
+		    .s_out(T1_s),
+		    .c_out(T1_c)
 	    	);
 	    
 	    CSA SUM_E_inst (
-		    .x_in(temp_sum),
-		    .y_in(temp_carry),
+		    .x_in(T1_s),
+		    .y_in(T1_c),
 		    .z_in(sum_E),
 		    
-		    .s_out(temp_sum),
-		    .c_out(temp_carry)
+		    .s_out(T1_s),
+		    .c_out(T1_c)
 	    	);
 	    
-	    T2_s = temp_sum;
-	    T2_c = temp_carry;
+	    T2_s = T1_s;
+	    T2_c = T1_c;
 	    
 	    CSA D_inst (
-		    .x_in(temp_sum),
-		    .y_in(temp_carry),
+		    .x_in(T1_s),
+		    .y_in(T1_c),
 		    .z_in(d_reg),
 		    
 		    .s_out(T1_s),
